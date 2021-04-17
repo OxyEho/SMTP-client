@@ -5,6 +5,7 @@ from client.mail_creator import MailCreator
 from client.smtp_client import Client
 
 if __name__ == '__main__':
+
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('-f', type=str, default='<>')
     # arg_parser.add_argument('--password', type=str)

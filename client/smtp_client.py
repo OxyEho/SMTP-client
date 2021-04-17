@@ -53,14 +53,17 @@ class Client:
     def _get_password():
         return getpass.getpass()
 
+    def get_images(self):
+        return [File(self._directory + x) for x in os.listdir(self._directory) if self._check_jpg(x)]
+
     @staticmethod
-    def _get_images():
-        return [File('pic/' + x) for x in os.listdir('pic')]
+    def _check_jpg(name: str) -> bool:
+        return name.endswith('.jpg')
 
     def _make_mail(self) -> str:
         mail_creator = MailCreator()
         mail_creator.add_header(self.login, self.to, self.subject)
-        files = self._get_images()
+        files = self.get_images()
         for i, file in enumerate(files):
             if i == len(files) - 1:
                 mail_creator.add_content(file, True)
