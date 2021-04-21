@@ -11,6 +11,7 @@ class MailCreator:
 
     def add_content(self, file: File, is_last: bool = False):
         self._result_mail += '\n\n--a'
+        self._result_mail += f'\nMime-Version: 1.0'
         self._result_mail += f'\nContent-Type: image/jpeg; name="=?UTF-8?B?{file.base64_name}?="'
         self._result_mail += f'\nContent-Disposition: attachment; filename="=?UTF-8?B?{file.base64_name}?="'
         self._result_mail += '\nContent-Transfer-Encoding: base64\n\n'
