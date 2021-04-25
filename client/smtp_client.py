@@ -29,10 +29,9 @@ class Client:
         self._set_server(server)
         self._set_commands()
 
-    def _create_socket(self) -> socket.socket:
+    @staticmethod
+    def _create_socket() -> socket.socket:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if self._do_ssl:
-            sock = ssl.wrap_socket(sock)
         return sock
 
     def _set_server(self, server_port: str):
@@ -76,15 +75,26 @@ class Client:
         answer = Answer(sock.recv(1024).decode('utf-8'))
         AnswerAnalyzer.analyze_answer(answer)
         if self._do_verbose:
-            print(answer)
+            print('<- ' + answer.all_msg)
+
+    def _send_msg(self, sock: socket.socket, msg: str):
+        if self._do_verbose:
+            print('-> ' + msg)
+        sock.send(msg.encode())
 
     def run(self):
         sock = self._create_socket()
         try:
             sock.connect((self._server, self._port))
             self._recv_msg(sock)
+            if self._do_ssl:
+                self._send_msg(sock, f'EHLO {self.login.replace("@", ".")}\n')
+                self._recv_msg(sock)
+                self._send_msg(sock, 'starttls\n')
+                self._recv_msg(sock)
+                sock = ssl.wrap_socket(sock)
             for command in self._commands:
-                sock.send(command.encode())
+                self._send_msg(sock, command)
                 self._recv_msg(sock)
                 if 'DATA' in command:
                     sock.send(self._make_mail().encode())
